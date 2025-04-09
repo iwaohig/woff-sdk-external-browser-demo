@@ -4,30 +4,68 @@
   <meta charset="UTF-8">
   <title>WOFF SDK 成功例</title>
   <script src="https://static.worksmobile.com/woff/sdk.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 1em; }
+    #output { white-space: pre-wrap; background: #f5f5f5; padding: 1em; border: 1px solid #ccc; }
+  </style>
 </head>
 <body>
   <h1>WOFF SDK 成功例</h1>
+  <div id="output">ログ出力:</div>
+
   <script>
     const woffId = 'YOUR_WOFF_ID'; // ← 自分の WOFF ID に置き換えてください
+    const outputDiv = document.getElementById("output");
+
+    // console.log と console.error を上書きして画面にも出力
+    const originalLog = console.log;
+    const originalErr = console.error;
+    console.log = function (...args) {
+      outputDiv.innerText += '\n' + args.join(' ');
+      originalLog.apply(console, args);
+    };
+    console.error = function (...args) {
+      outputDiv.innerText += '\n[ERROR] ' + args.join(' ');
+      originalErr.apply(console, args);
+    };
 
     window.addEventListener('load', () => {
       woff.init({ woffId })
         .then(() => {
+          console.log("woff initialized");
+
           if (!woff.isLoggedIn()) {
+            console.log("not logged in yet, calling login...");
             return woff.login().then(() => {
+              console.log("再度 init 実行中...");
               return woff.init({ woffId });
             });
           }
+
+          return Promise.resolve();
         })
         .then(() => {
           return woff.getProfile();
         })
         .then(profile => {
-          console.log("プロフィール取得成功", profile);
+          console.log("プロフィール取得成功", JSON.stringify(profile, null, 2));
+          showProfile(profile);
         })
         .catch(err => {
           console.error("エラー:", err);
         });
+
+      function showProfile(profile) {
+        const html = `
+          <h2>ログインユーザー情報</h2>
+          <ul>
+            <li><strong>名前:</strong> ${profile.name || 'N/A'}</li>
+            <li><strong>メール:</strong> ${profile.email || 'N/A'}</li>
+            <li><strong>ユーザーID:</strong> ${profile.id || 'N/A'}</li>
+          </ul>
+        `;
+        outputDiv.innerHTML += html;
+      }
     });
   </script>
 </body>
