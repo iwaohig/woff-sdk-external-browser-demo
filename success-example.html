@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>WOFF SDK 成功例</title>
+  <script src="https://static.worksmobile.com/woff/sdk.js"></script>
+</head>
+<body>
+  <h1>WOFF SDK 成功例</h1>
+  <script>
+    const woffId = 'YOUR_WOFF_ID'; // ← 自分の WOFF ID に置き換えてください
+
+    window.addEventListener('load', () => {
+      woff.init({ woffId })
+        .then(() => {
+          if (!woff.isLoggedIn()) {
+            return woff.login().then(() => {
+              return woff.init({ woffId });
+            });
+          }
+        })
+        .then(() => {
+          return woff.getProfile();
+        })
+        .then(profile => {
+          console.log("プロフィール取得成功", profile);
+        })
+        .catch(err => {
+          console.error("エラー:", err);
+        });
+    });
+  </script>
+</body>
+</html>
