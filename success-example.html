@@ -38,27 +38,36 @@
 
           if (!woff.isLoggedIn()) {
             console.log("not logged in yet, calling login...");
-
+            outputDiv.innerText += "\n※ログイン前の状態です。ログやネットワーク状況を確認できます。";
             const goLogin = confirm("まだログインしていません。\nLINE WORKS ログイン画面へ進みますか？");
+
             if (!goLogin) {
               console.log("ログインをキャンセルしました。");
               return;
             }
 
-            return woff.login({ redirectUri }).then(() => {
-              console.log("再度 init 実行中...");
-              return woff.init({ woffId });
-            });
+            console.log("5秒待ってから login を開始します...");
+            setTimeout(() => {
+              woff.login({ redirectUri }).then(() => {
+                console.log("再度 init 実行中...");
+                return woff.init({ woffId });
+              }).then(() => {
+                return woff.getProfile();
+              }).then(profile => {
+                console.log("プロフィール取得成功", JSON.stringify(profile, null, 2));
+                showProfile(profile);
+              }).catch(err => {
+                console.error("エラー:", err);
+              });
+            }, 5000); // ← ここで5秒待つ
+
+            return;
           }
 
-          return Promise.resolve();
-        })
-        .then(() => {
-          return woff.getProfile();
-        })
-        .then(profile => {
-          console.log("プロフィール取得成功", JSON.stringify(profile, null, 2));
-          showProfile(profile);
+          return woff.getProfile().then(profile => {
+            console.log("プロフィール取得成功", JSON.stringify(profile, null, 2));
+            showProfile(profile);
+          });
         })
         .catch(err => {
           console.error("エラー:", err);
