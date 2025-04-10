@@ -16,9 +16,10 @@
 
   <script>
     const woffId = 'ioka5CiR7TDYN-FK_XKYcQ';
+    const redirectUri = "https://iwaohig.github.io/woff-sdk-external-browser-demo/success-example.html";
     const outputDiv = document.getElementById("output");
 
-    // console.log と console.error を画面にも出力
+    // console.log / console.error を画面に出力
     const originalLog = console.log;
     const originalErr = console.error;
     console.log = function (...args) {
@@ -37,7 +38,7 @@
 
           if (!woff.isLoggedIn()) {
             console.log("not logged in yet, calling login...");
-            return woff.login().then(() => {
+            return woff.login({ redirectUri }).then(() => {
               console.log("再度 init 実行中...");
               return woff.init({ woffId });
             });
