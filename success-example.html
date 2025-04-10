@@ -15,10 +15,10 @@
   <div id="output">ログ出力:</div>
 
   <script>
-    const woffId = 'ioka5CiR7TDYN-FK_XKYcQ'; // ← あなたの WOFF ID（反映済み）
+    const woffId = 'ioka5CiR7TDYN-FK_XKYcQ';
     const outputDiv = document.getElementById("output");
 
-    // console.log と console.error を上書きして画面にも出力
+    // console.log と console.error を画面にも出力
     const originalLog = console.log;
     const originalErr = console.error;
     console.log = function (...args) {
@@ -60,9 +60,10 @@
         const html = `
           <h2>ログインユーザー情報</h2>
           <ul>
-            <li><strong>名前:</strong> ${profile.name || 'N/A'}</li>
+            <li><strong>表示名:</strong> ${profile.displayName || 'N/A'}</li>
             <li><strong>メール:</strong> ${profile.email || 'N/A'}</li>
-            <li><strong>ユーザーID:</strong> ${profile.id || 'N/A'}</li>
+            <li><strong>ユーザーID:</strong> ${profile.userId || 'N/A'}</li>
+            <li><strong>ドメインID:</strong> ${profile.domainId || 'N/A'}</li>
           </ul>
         `;
         outputDiv.innerHTML += html;
