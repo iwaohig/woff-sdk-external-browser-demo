@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>WOFF SDK ユーザー情報表示</title>
+  <title>WOFF SDK ユーザー情報表示 ｑｑｑｑ</title>
   <script charset="utf-8" src="https://static.worksmobile.net/static/wm/woff/edge/3.6.2/sdk.js"></script>
   <style>
     body { font-family: sans-serif; padding: 2em; }
@@ -20,16 +20,31 @@
     const WOFF_ID = "ioka5CiR7TDYN-FK_XKYcQ";
     const DOMAIN_NAME = "lwugdev";
 
+    console.log("[SDK] init start", WOFF_ID);
     woff.init({ woffId: WOFF_ID })
       .then(() => {
+        console.log("[SDK] init success");
+
         const os = woff.getOS();
         const isLoggedIn = woff.isLoggedIn();
+        const lang = woff.getLanguage();
+        const version = woff.getVersion();
+        const worksVersion = woff.getWorksVersion();
+        const context = woff.getContext();
+
+        console.log("[SDK] OS:", os);
+        console.log("[SDK] isLoggedIn:", isLoggedIn);
+        console.log("[SDK] Language:", lang);
+        console.log("[SDK] SDK Version:", version);
+        console.log("[SDK] LINE WORKS Version:", worksVersion);
+        console.log("[SDK] Context:", context);
 
         document.getElementById("env-check").innerText = os + (os === 'web' ? " (PCブラウザ)" : " (モバイル)");
 
         if (os === 'web' && !isLoggedIn) {
           const shouldLogin = confirm("LINE WORKS にログインしていません。ログインしますか？");
           if (shouldLogin) {
+            console.log("[SDK] Triggering login");
             woff.login({ domain: DOMAIN_NAME });
             return;
           } else {
@@ -38,12 +53,14 @@
           }
         }
 
+        console.log("[SDK] Calling getProfile");
         return woff.getProfile().then((profile) => {
+          console.log("[SDK] Profile fetched:", profile);
           document.getElementById("userName").innerText = profile.displayName || "(名前なし)";
         });
       })
       .catch((err) => {
-        console.error("エラー:", err);
+        console.error("[SDK] エラー:", err);
         document.getElementById("errorMsg").innerText = `[${err.code || "undefined"}] ${err.message || "エラー詳細不明"}`;
         document.getElementById("userName").innerText = "取得失敗";
       });
