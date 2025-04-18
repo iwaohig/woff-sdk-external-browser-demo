@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>WOFF SDK v3.6.2 ユーザー名表示</title>
+  <title>WOFF SDK ユーザー情報表示</title>
   <script charset="utf-8" src="https://static.worksmobile.net/static/wm/woff/edge/3.6.2/sdk.js"></script>
   <style>
     body { font-family: sans-serif; padding: 2em; }
@@ -11,24 +11,33 @@
   </style>
 </head>
 <body>
-  <h1>WOFF SDK v3.6.2 ユーザー情報表示</h1>
+  <h1>WOFF SDK ユーザー情報表示</h1>
   <p>WOFF クライアントか判定：<span id="env-check">確認中...</span></p>
   <div id="user-info">ユーザー名：<span id="userName">読み込み中...</span></div>
   <div class="error" id="errorMsg"></div>
 
   <script>
     const WOFF_ID = "ioka5CiR7TDYN-FK_XKYcQ";
+    const DOMAIN_NAME = "lwugdev"; // LINE WORKS ドメイン名を指定
 
     woff.init({ woffId: WOFF_ID })
       .then(() => {
-        document.getElementById("env-check").innerText = woff.isInClient() ? "WOFF クライアント内" : "外部ブラウザ";
-        return woff.getProfile();
-      })
-      .then((profile) => {
-        document.getElementById("userName").innerText = profile.displayName || "(名前なし)";
+        const os = woff.getOS();
+
+        if (os === 'web') {
+          // PC ブラウザの場合はログインにリダイレクト（redirectUri は省略）
+          woff.login({ domain: DOMAIN_NAME });
+          return;
+        }
+
+        // モバイル環境でのみプロフィールを取得
+        return woff.getProfile().then((profile) => {
+          document.getElementById("userName").innerText = profile.displayName || "(名前なし)";
+          document.getElementById("env-check").innerText = os + " (モバイル)";
+        });
       })
       .catch((err) => {
-        console.error("初期化エラー:", err);
+        console.error("エラー:", err);
         document.getElementById("errorMsg").innerText = `[${err.code}] ${err.message}`;
         document.getElementById("userName").innerText = "取得失敗";
       });
