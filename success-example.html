@@ -11,36 +11,40 @@
   </style>
 </head>
 <body>
-  <h1>WOFF SDK ユーザー情報表示 １２３</h1>
+  <h1>WOFF SDK ユーザー情報表示</h1>
   <p>WOFF クライアントか判定：<span id="env-check">確認中...</span></p>
   <div id="user-info">ユーザー名：<span id="userName">読み込み中...</span></div>
   <div class="error" id="errorMsg"></div>
 
   <script>
     const WOFF_ID = "ioka5CiR7TDYN-FK_XKYcQ";
-    const DOMAIN_NAME = "lwugdev"; // LINE WORKS ドメイン名を指定
+    const DOMAIN_NAME = "lwugdev";
 
     woff.init({ woffId: WOFF_ID })
       .then(() => {
         const os = woff.getOS();
+        const isLoggedIn = woff.isLoggedIn();
 
-        if (os === 'web') {
-          // PC ブラウザの場合はログイン状態を確認して、未ログインならログインへリダイレクト
-          if (!woff.isLoggedIn()) {
+        document.getElementById("env-check").innerText = os + (os === 'web' ? " (PCブラウザ)" : " (モバイル)");
+
+        if (os === 'web' && !isLoggedIn) {
+          const shouldLogin = confirm("LINE WORKS にログインしていません。ログインしますか？");
+          if (shouldLogin) {
             woff.login({ domain: DOMAIN_NAME });
+            return;
+          } else {
+            document.getElementById("userName").innerText = "ログイン未実施";
             return;
           }
         }
 
-        // ログイン済み or モバイル環境 → プロフィール取得
         return woff.getProfile().then((profile) => {
           document.getElementById("userName").innerText = profile.displayName || "(名前なし)";
-          document.getElementById("env-check").innerText = os + (os === 'web' ? " (PCブラウザ)" : " (モバイル)");
         });
       })
       .catch((err) => {
         console.error("エラー:", err);
-        document.getElementById("errorMsg").innerText = `[${err.code}] ${err.message}`;
+        document.getElementById("errorMsg").innerText = `[${err.code || "undefined"}] ${err.message || "エラー詳細不明"}`;
         document.getElementById("userName").innerText = "取得失敗";
       });
   </script>
