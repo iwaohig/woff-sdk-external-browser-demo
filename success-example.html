@@ -11,7 +11,7 @@
   </style>
 </head>
 <body>
-  <h1>WOFF SDK ユーザー情報表示</h1>
+  <h1>あはは WOFF SDK ユーザー情報表示</h1>
   <p>WOFF クライアントか判定：<span id="env-check">確認中...</span></p>
   <div id="user-info">ユーザー名：<span id="userName">読み込み中...</span></div>
   <div class="error" id="errorMsg"></div>
@@ -21,6 +21,12 @@
     const DOMAIN_NAME = "lwugdev";
 
     console.log("[SDK] init start", WOFF_ID);
+    console.log("[SDK] location.href:", window.location.href);
+    console.log("[SDK] location.search:", window.location.search);
+    if (!window.location.search.includes("woff.state") && !window.location.search.includes("access_token")) {
+      console.warn("[SDK] 認証トークン情報が URL に存在しません。初期化できない可能性があります。");
+    }
+
     woff.init({ woffId: WOFF_ID })
       .then(() => {
         console.log("[SDK] init success");
@@ -44,8 +50,8 @@
         if (os === 'web' && !isLoggedIn) {
           const shouldLogin = confirm("LINE WORKS にログインしていません。ログインしますか？");
           if (shouldLogin) {
-            console.log("[SDK] Triggering login");
-            woff.login({ domain: DOMAIN_NAME });
+            console.log("[SDK] Triggering login with redirectUri", window.location.href);
+            woff.login({ domain: DOMAIN_NAME, redirectUri: window.location.href });
             return;
           } else {
             document.getElementById("userName").innerText = "ログイン未実施";
