@@ -1,59 +1,37 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>WOFF 外部ブラウザ対応サンプル</title>
+  <meta charset="UTF-8" />
+  <title>WOFF SDK v3.6.2 ユーザー名表示</title>
   <script charset="utf-8" src="https://static.worksmobile.net/static/wm/woff/edge/3.6.2/sdk.js"></script>
   <style>
     body { font-family: sans-serif; padding: 2em; }
-    #log { background: #f0f0f0; padding: 1em; border: 1px solid #ccc; margin-top: 1em; white-space: pre-wrap; }
+    #user-info { margin-top: 1em; font-size: 1.2em; }
+    .error { color: red; }
   </style>
 </head>
 <body>
-  <h1>WOFF 外部ブラウザ対応サンプル（redirectUri 省略）</h1>
-  <div id="log">ログ出力：</div>
+  <h1>WOFF SDK v3.6.2 ユーザー情報表示</h1>
+  <p>WOFF クライアントか判定：<span id="env-check">確認中...</span></p>
+  <div id="user-info">ユーザー名：<span id="userName">読み込み中...</span></div>
+  <div class="error" id="errorMsg"></div>
 
   <script>
-    const woffId = 'ioka5CiR7TDYN-FK_XKYcQ';
-    const logDiv = document.getElementById("log");
+    const WOFF_ID = "ioka5CiR7TDYN-FK_XKYcQ";
 
-    const log = (...args) => {
-      console.log(...args);
-      logDiv.innerText += "\n" + args.map(a => typeof a === "object" ? JSON.stringify(a, null, 2) : a).join(" ");
-    };
-
-    const showProfile = (profile) => {
-      log("\n=== プロフィール情報 ===");
-      log("表示名:", profile.displayName || "N/A");
-      log("ユーザーID:", profile.userId || "N/A");
-      log("ドメインID:", profile.domainId || "N/A");
-      log("メール:", profile.email || "N/A");
-    };
-
-    window.addEventListener("load", () => {
-      woff.init({ woffId })
-        .then(() => {
-          log("woff initialized");
-
-          if (!woff.isLoggedIn()) {
-            log("未ログイン → ログイン処理開始（redirectUri は指定なし）");
-            return woff.login().then(() => {
-              log("ログイン完了 → 再初期化");
-              return woff.init({ woffId });
-            });
-          }
-
-          return Promise.resolve();
-        })
-        .then(() => {
-          return woff.getProfile();
-        })
-        .then(showProfile)
-        .catch(err => {
-          console.error(err);
-          log("[エラー]", err.message || JSON.stringify(err));
-        });
-    });
+    woff.init({ woffId: WOFF_ID })
+      .then(() => {
+        document.getElementById("env-check").innerText = woff.isInClient() ? "WOFF クライアント内" : "外部ブラウザ";
+        return woff.getProfile();
+      })
+      .then((profile) => {
+        document.getElementById("userName").innerText = profile.displayName || "(名前なし)";
+      })
+      .catch((err) => {
+        console.error("初期化エラー:", err);
+        document.getElementById("errorMsg").innerText = `[${err.code}] ${err.message}`;
+        document.getElementById("userName").innerText = "取得失敗";
+      });
   </script>
 </body>
 </html>
