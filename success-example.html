@@ -25,15 +25,17 @@
         const os = woff.getOS();
 
         if (os === 'web') {
-          // PC ブラウザの場合はログインにリダイレクト（redirectUri は省略）
-          woff.login({ domain: DOMAIN_NAME });
-          return;
+          // PC ブラウザの場合はログイン状態を確認して、未ログインならログインへリダイレクト
+          if (!woff.isLoggedIn()) {
+            woff.login({ domain: DOMAIN_NAME });
+            return;
+          }
         }
 
-        // モバイル環境でのみプロフィールを取得
+        // ログイン済み or モバイル環境 → プロフィール取得
         return woff.getProfile().then((profile) => {
           document.getElementById("userName").innerText = profile.displayName || "(名前なし)";
-          document.getElementById("env-check").innerText = os + " (モバイル)";
+          document.getElementById("env-check").innerText = os + (os === 'web' ? " (PCブラウザ)" : " (モバイル)");
         });
       })
       .catch((err) => {
